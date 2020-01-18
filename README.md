@@ -1,3 +1,1 @@
-# cuHacking
-# cuHacking
 # powerfulHand
