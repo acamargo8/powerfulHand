@@ -1,0 +1,25 @@
+{
+  "name": "powerfulhand",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acamargo8/powerfulHand.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acamargo8/powerfulHand/issues"
+  },
+  "homepage": "https://github.com/acamargo8/powerfulHand#readme",
+  "dependencies": {
+    "angular": "^1.7.9",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "robotjs": "^0.6.0"
+  }
+}
