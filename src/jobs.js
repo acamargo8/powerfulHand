@@ -73,10 +73,10 @@ function analyzer(jsonBody) {
         $gesture = 5
     else
         $gesture = 6
-    return response($gesture);
+    return $gesture_string;
 }
 
-function response(id) {
+function response(gesture_string) {
     let MOVE_LEFT = 0;
     let MOVE_RIGHT = 1;
     let SCROLL_UP = 2;
