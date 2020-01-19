@@ -1,5 +1,6 @@
 var fs = require("fs");
 var request = require("request");
+var { getGesture } = require("./hand_movements");
 //let PICTURE = "person.jpg"
 let PICTURE = "movie.mov"
 //let file = fs.createReadStream(`${PICTURE}`);
@@ -16,8 +17,8 @@ var jobRequest = {
   },
   formData: {
     work_type: "json",
-    heads: "true",
-    est_3d: "true",
+    hands: "true",
+    est_3d: "false",
     media: file
   }
 };
@@ -55,20 +56,57 @@ function getJob(jobID, jobToken, callback) {
 function analyzer(jsonBody) {
 
     // Get Gesture and send it back
-    $gesture = 0
+    $gesture = -1
+    $gesture_string = getGesture(jsonBody)
+
+    if($gesture_string == "move_left")
+        $gesture = 0
+    else if($gesture_string == "move_right")
+        $gesture = 1
+    else if($gesture_string == "scroll_up")
+        $gesture = 2
+    else if($gesture_string == "scroll_down")
+        $gesture = 3
+    else if($gesture_string == "left_click")
+        $gesture = 4
+    else if($gesture_string == "right_click")
+        $gesture = 5
+    else
+        $gesture = 6
     return response($gesture);
 }
 
 function response(id) {
     let MOVE_LEFT = 0;
     let MOVE_RIGHT = 1;
+    let SCROLL_UP = 2;
+    let SCROLL_DOWN = 3;
+    let LEFT_CLICK = 4;
+    let RIGHT_CLICK = 5;
+    let NO_GESTURE = 6;
 
-    if (id === MOVE_LEFT) {
+    if (id == MOVE_LEFT) {
         console.log("Status: MOVE_LEFT");
         return MOVE_LEFT;
-    } else {
+    } else if(id == MOVE_RIGHT){
         console.log("Status: MOVE_RIGHT");
         return MOVE_RIGHT;
+    } else if(id == SCROLL_UP){
+        console.log("Status: SCROLL_UP");
+        return SCROLL_UP;
+    } else if(id == SCROLL_DOWN){
+        console.log("Status: SCROLL_DOWN");
+        return SCROLL_DOWN;
+    } else if(id == LEFT_CLICK){
+        console.log("Status: LEFT_CLICK");
+        return LEFT_CLICK;
+    } else if(id == RIGHT_CLICK){
+        console.log("Status: RIGHT_CLICK");
+        return RIGHT_CLICK;
+    }
+    else{
+        console.log("Status: NO_GESTURE");
+        return NO_GESTURE;
     }
 }
 

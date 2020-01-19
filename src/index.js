@@ -5,6 +5,7 @@ var io = require('socket.io')(http);
 var fs = require('fs');
 var exec = require('child_process').exec;
 var { job } = require("./jobs");
+var { getGesture } = require("./hand_movements");
 var port = process.env.PORT || 3000;
 
 Files = {};
@@ -68,6 +69,7 @@ io.sockets.on('connection', function (socket) {
                 //console.log("response is here man ", tired);
                 var answer = { "gesture": gesture };
                 socket.emit('GotGesture', answer);
+                socket.emit('chat message', gesture);
               });
               fs.unlink("Temp/" + Name, function ()
               {

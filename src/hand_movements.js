@@ -38,7 +38,7 @@ function checkForMovement(fdArray)
     cm_counter = 0
     cm_movement_counter = 0
     dist_threshold = 0.005
-    mov_num_threshold = 15
+    mov_num_threshold = 5
 
     last_moved = false
     max_consecutive_left_moves = 0
@@ -74,6 +74,7 @@ function checkForMovement(fdArray)
             break
     }
 
+    console.log(max_consecutive_right_moves + "      " + max_consecutive_left_moves)
     // If hand moved both up and down, consider as no scroll
     if(max_consecutive_right_moves > 3 && max_consecutive_left_moves > 3){
         return "no_move"
@@ -215,10 +216,10 @@ var total_false = 0;
 var left_click = false;
 var right_click = false;
 
-function getGesture()
+function getGesture(jsonPath)
 {
     //read json from a file
-    var data = require('../mouse_simulation_data/mouse_move_left/mouse_move_left.json')
+    var data = jsonPath
     const values = data["frames"];
     var num_frame = values.length
     var arr = [];
@@ -274,4 +275,4 @@ function getGesture()
     return "no_gesture"
 }
 
-console.log(getGesture())
+module.exports = { getGesture };
