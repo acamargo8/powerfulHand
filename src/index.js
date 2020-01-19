@@ -52,6 +52,11 @@ io.sockets.on('connection', function (socket) {
     });
   });
 
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+    io.sockets.emit('chat message', msg);
+  });
+
   socket.on('Upload', function (data){
     var Name = data['Name'];
     Files[Name]['Downloaded'] += data['Data'].length;
@@ -68,8 +73,8 @@ io.sockets.on('connection', function (socket) {
               job("./Video/" + Name, function(gesture){
                 //console.log("response is here man ", tired);
                 var answer = { "gesture": gesture };
-                socket.emit('GotGesture', answer);
-                socket.emit('chat message', gesture);
+//                socket.emit('GotGesture', answer);
+                io.sockets.emit('chat message', gesture);
               });
               fs.unlink("Temp/" + Name, function ()
               {
