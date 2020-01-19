@@ -37,7 +37,7 @@ function checkForMovement(fdArray)
 {    
     cm_counter = 0
     cm_movement_counter = 0
-    dist_threshold = 0.006
+    dist_threshold = 0.005
     mov_num_threshold = 15
 
     last_moved = false
@@ -218,7 +218,7 @@ var right_click = false;
 function getGesture()
 {
     //read json from a file
-    var data = require('./Move_Right_2.json')
+    var data = require('../mouse_simulation_data/mouse_move_left/mouse_move_left.json')
     const values = data["frames"];
     var num_frame = values.length
     var arr = [];
