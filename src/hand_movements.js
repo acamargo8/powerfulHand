@@ -148,8 +148,8 @@ function checkForScroll(fdArray){
 function mouseLeftClick(fdArray){
     for(frameData in fdArray){
         if(counter >= 0){
-            if (fdArray[counter].thumb.xPos - fdArray[counter].index.xPos < 0.015 &&
-                fdArray[counter].thumb.yPos - fdArray[counter].index.yPos < 0.025)
+            if (fdArray[counter].thumb.xPos - fdArray[counter].index.xPos < 0.020 &&
+                fdArray[counter].thumb.yPos - fdArray[counter].index.yPos < 0.125)
             {
                 total_true = total_true + 1;
             } 
@@ -159,7 +159,8 @@ function mouseLeftClick(fdArray){
         counter++
         }
     }
-    if (total_true/counter > 0.70){
+    console.log(total_true)
+    if ((total_true/counter) > 0.60){
         left_click = true;
         return left_click
     } 
@@ -181,7 +182,8 @@ function mouseRightClick(fdArray){
         counter++
         }
     }
-    if (total_true/counter > 0.70){
+    console.log(total_true)
+    if (total_true/counter > 0.50){
         right_click = true;
         return right_click;
     } 
