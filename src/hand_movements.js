@@ -38,7 +38,7 @@ function checkForMovement(fdArray)
     cm_counter = 0
     cm_movement_counter = 0
     dist_threshold = 0.005
-    mov_num_threshold = 5
+    mov_num_threshold = 10
 
     last_moved = false
     max_consecutive_left_moves = 0
@@ -80,7 +80,7 @@ function checkForMovement(fdArray)
         return "no_move"
     }
     
-    if(cm_movement_counter > mov_num_threshold && (max_consecutive_left_moves > 3 || max_consecutive_right_moves > 3)){
+    if(cm_movement_counter > mov_num_threshold && (max_consecutive_left_moves > 5 || max_consecutive_right_moves > 5)){
         if(fdArray[0].root.xPos < fdArray[fdArray.length - 1].root.xPos)
             return "move_left"
         else
