@@ -1,3 +1,7 @@
+///
+/// Calling get gesture parses a hardcoded video and returns a string with the gesture
+///
+
 // Frame data class to hold hand information
 class FrameData {
     constructor(joint_array){
@@ -33,24 +37,55 @@ function checkForMovement(fdArray)
 {    
     cm_counter = 0
     cm_movement_counter = 0
-    dist_threshold = 0.008
-    mov_num_threshold = 10
+    dist_threshold = 0.006
+    mov_num_threshold = 15
 
-    for(frameData in fdArray)
-    {
-        if(cm_counter > 0)
-        {
+    last_moved = false
+    max_consecutive_left_moves = 0
+    max_consecutive_right_moves = 0
+    consecutive_left_moves = 0
+    consecutive_right_moves = 0
+
+    for(frameData in fdArray){
+        if(cm_counter > 0){
             if((Math.abs(fdArray[cm_counter].index.xPos - fdArray[cm_counter - 1].index.xPos) > dist_threshold)){
+                if(fdArray[cm_counter].index.xPos < fdArray[cm_counter - 1].index.xPos)
+                    consecutive_left_moves++
+                else
+                    consecutive_right_moves++
+
                 cm_movement_counter++
+                last_moved = true
+            }
+            else{
+                last_moved = false
+                if(consecutive_left_moves > max_consecutive_left_moves)
+                    max_consecutive_left_moves = consecutive_left_moves
+
+                if(consecutive_right_moves > max_consecutive_right_moves)
+                    max_consecutive_right_moves = consecutive_right_moves
+
+                consecutive_left_moves = 0
+                consecutive_right_moves = 0
             }
         }
         cm_counter++
+        if(cm_counter >= fdArray.length)
+            break
     }
 
-    if(cm_movement_counter > mov_num_threshold){
-        return "mouse_move"
+    // If hand moved both up and down, consider as no scroll
+    if(max_consecutive_right_moves > 3 && max_consecutive_left_moves > 3){
+        return "no_move"
     }
-    return "no_mouse_move"
+    
+    if(cm_movement_counter > mov_num_threshold && (max_consecutive_left_moves > 3 || max_consecutive_right_moves > 3)){
+        if(fdArray[0].index.xPos < fdArray[fdArray.length - 1].index.xPos)
+            return "move_left"
+        else
+            return "move_right"
+    }
+    return "no_move"
 }
 
 // Check if scroll gesture was performed
@@ -94,17 +129,12 @@ function checkForScroll(fdArray){
             break
     }
 
-    console.log(sc_movement_counter)
-    console.log(max_consecutive_up_moves + " = max up moves")
-    console.log(max_consecutive_down_moves + " = max down moves")
-
     // If hand moved both up and down, consider as no scroll
     if(max_consecutive_down_moves > 3 && max_consecutive_up_moves > 3){
         return "no_scroll"
     }
     
     if(sc_movement_counter > mov_num_threshold && (max_consecutive_up_moves > 3 || max_consecutive_down_moves > 3)){
-        console.log(fdArray[0].index.yPos + "  " + fdArray[fdArray.length - 1].index.yPos)
         if(fdArray[0].index.yPos < fdArray[fdArray.length - 1].index.yPos)
             return "scroll_down"
         else
@@ -179,74 +209,69 @@ function checkForClick(fdArray)
 // ===================================================
 // ================ Main Function ====================
 // ===================================================
+function getGesture()
+{
+    //read json from a file
+    var data = require('../mouse_simulation_data/mouse_move_right/mouse_move_right.json')
+    const values = data["frames"];
+    var num_frame = values.length
+    var arr = [];
+    var fdArray = [];
 
-const THRESHOLD = 0.05
-
-//read json from a file
-var data = require('../mouse_simulation_data/mouse_scroll_down/mouse_scroll_down.json')
-const values = data["frames"];
-var num_frame = values.length
-var arr = [];
-var fdArray = [];
-
-for (i = 0; i < num_frame; i++){
-    delete values[i].height;
-    delete values[i].width;
-    try{
-        arr.push({
-            frame_time : values[i].frame_time,
-            x_root : values[i].persons[0].hand_pose.right.joints[0],
-            y_root : values[i].persons[0].hand_pose.right.joints[1],
-            x_thumb : values[i].persons[0].hand_pose.right.joints[16],
-            y_thumb : values[i].persons[0].hand_pose.right.joints[17],
-            x_index : values[i].persons[0].hand_pose.right.joints[22],
-            y_index : values[i].persons[0].hand_pose.right.joints[23],
-            x_middle : values[i].persons[0].hand_pose.right.joints[28],
-            y_middle : values[i].persons[0].hand_pose.right.joints[29],
-            x_ring : values[i].persons[0].hand_pose.right.joints[34],
-            y_ring : values[i].persons[0].hand_pose.right.joints[35],
-            x_pinky : values[i].persons[0].hand_pose.right.joints[40],
-            y_pinky : values[i].persons[0].hand_pose.right.joints[41],
-        });
-    
-        fdArray.push(new FrameData(arr[i]))
+    for (i = 0; i < num_frame; i++){
+        delete values[i].height;
+        delete values[i].width;
+        try{
+            arr.push({
+                frame_time : values[i].frame_time,
+                x_root : values[i].persons[0].hand_pose.right.joints[0],
+                y_root : values[i].persons[0].hand_pose.right.joints[1],
+                x_thumb : values[i].persons[0].hand_pose.right.joints[16],
+                y_thumb : values[i].persons[0].hand_pose.right.joints[17],
+                x_index : values[i].persons[0].hand_pose.right.joints[22],
+                y_index : values[i].persons[0].hand_pose.right.joints[23],
+                x_middle : values[i].persons[0].hand_pose.right.joints[28],
+                y_middle : values[i].persons[0].hand_pose.right.joints[29],
+                x_ring : values[i].persons[0].hand_pose.right.joints[34],
+                y_ring : values[i].persons[0].hand_pose.right.joints[35],
+                x_pinky : values[i].persons[0].hand_pose.right.joints[40],
+                y_pinky : values[i].persons[0].hand_pose.right.joints[41],
+            });
+        
+            fdArray.push(new FrameData(arr[i]))
+        }
+        catch(err)
+        {
+            console.log("Error parsing frame #" + i + ". Skipping...")
+        }
     }
-    catch(err)
-    {
-        console.log("Error parsing frame #" + i + ". Skipping...")
-    }
-}
-var gesture = ""
-gesture = checkForMovement(fdArray)
+    var gesture = ""
+    gesture = checkForMovement(fdArray)
 
-if(gesture == "mouse_move"){
-    for(frameData in fdArray){
-        // 
-        //Enter code to do the mouse movement
-        //
-    }
-    console.log(gesture)
-}
-else{
-    gesture = checkForScroll(fdArray)
-
-    if(gesture == "scroll_down" || gesture == "scroll_up"){
-        console.log(gesture)
+    if(gesture == "move_left" || gesture == "move_right"){
+        return gesture
     }
     else{
-        //Variables for checkForClick function
-        counter = 0;
-        var total_true = 0;
-        var total_false = 0;
-        var left_click = false;
-        var right_click = false;
+        gesture = checkForScroll(fdArray)
 
-        gesture = checkForClick(fdArray)
+        if(gesture == "scroll_down" || gesture == "scroll_up"){
+            return gesture
+        }
+        else{
+            //Variables for checkForClick function
+            counter = 0;
+            var total_true = 0;
+            var total_false = 0;
+            var left_click = false;
+            var right_click = false;
 
-        if(gesture == "left_click" || gesture == "right_click")
-            console.log(gesture)
-        
-        else
-            console.log("no_gesture")
+            gesture = checkForClick(fdArray)
+
+            if(gesture == "left_click" || gesture == "right_click")
+                return gesture
+        }
     }
+    return "no_gesture"
 }
+
+//console.log(getGesture())
