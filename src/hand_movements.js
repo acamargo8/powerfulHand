@@ -48,8 +48,8 @@ function checkForMovement(fdArray)
 
     for(frameData in fdArray){
         if(cm_counter > 0){
-            if((Math.abs(fdArray[cm_counter].index.xPos - fdArray[cm_counter - 1].index.xPos) > dist_threshold)){
-                if(fdArray[cm_counter].index.xPos < fdArray[cm_counter - 1].index.xPos)
+            if((Math.abs(fdArray[cm_counter].root.xPos - fdArray[cm_counter - 1].root.xPos) > dist_threshold)){
+                if(fdArray[cm_counter].root.xPos < fdArray[cm_counter - 1].root.xPos)
                     consecutive_left_moves++
                 else
                     consecutive_right_moves++
@@ -80,7 +80,7 @@ function checkForMovement(fdArray)
     }
     
     if(cm_movement_counter > mov_num_threshold && (max_consecutive_left_moves > 3 || max_consecutive_right_moves > 3)){
-        if(fdArray[0].index.xPos < fdArray[fdArray.length - 1].index.xPos)
+        if(fdArray[0].root.xPos < fdArray[fdArray.length - 1].root.xPos)
             return "move_left"
         else
             return "move_right"
@@ -209,10 +209,16 @@ function checkForClick(fdArray)
 // ===================================================
 // ================ Main Function ====================
 // ===================================================
+counter = 0;
+var total_true = 0;
+var total_false = 0;
+var left_click = false;
+var right_click = false;
+
 function getGesture()
 {
     //read json from a file
-    var data = require('../mouse_simulation_data/mouse_move_right/mouse_move_right.json')
+    var data = require('./Move_Right_2.json')
     const values = data["frames"];
     var num_frame = values.length
     var arr = [];
@@ -259,12 +265,6 @@ function getGesture()
         }
         else{
             //Variables for checkForClick function
-            counter = 0;
-            var total_true = 0;
-            var total_false = 0;
-            var left_click = false;
-            var right_click = false;
-
             gesture = checkForClick(fdArray)
 
             if(gesture == "left_click" || gesture == "right_click")
@@ -274,4 +274,4 @@ function getGesture()
     return "no_gesture"
 }
 
-//console.log(getGesture())
+console.log(getGesture())
