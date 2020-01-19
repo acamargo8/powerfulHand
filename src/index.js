@@ -3,10 +3,8 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
-var util = require('util');
 var exec = require('child_process').exec;
-const { process } = require("./jobs");
-
+var { job } = require("./jobs");
 var port = process.env.PORT || 3000;
 
 Files = {};
@@ -66,7 +64,7 @@ io.sockets.on('connection', function (socket) {
           input.pipe(output);
           input.on("end", function() {
               console.log("Uploaded file: Video/" + Name );
-              process(function(gesture){
+              job("./Video/" + Name, function(gesture){
                 //console.log("response is here man ", tired);
                 var answer = { "gesture": gesture };
                 socket.emit('GotGesture', answer);

@@ -1,10 +1,10 @@
 var fs = require("fs");
 var request = require("request");
-const { readJSON, overwriteJSON } = require("./config/compare");
 //let PICTURE = "person.jpg"
 let PICTURE = "movie.mov"
-let file = fs.createReadStream(`${PICTURE}`);
+//let file = fs.createReadStream(`${PICTURE}`);
 let TOKEN = '';
+let file = '';
 
 var jobRequest = {
   method: "POST",
@@ -74,15 +74,19 @@ function response(id) {
 
 
 /****************** Main function  ********/
-function process(callback){
+function job(movieFile, callback){
+
+    console.log("processing movie file = " + movieFile);
 
     request(loginRequest, function (error, response, body) {
         if (error) throw new Error(error);
 
         TOKEN = 'Bearer ' + body.access_token
         console.log('TOKEN', TOKEN);
+        console.log('movieFile', movieFile);
 
         jobRequest.headers.Authorization = TOKEN;
+        jobRequest.formData.media = fs.createReadStream(`${movieFile}`);
 
         request(jobRequest, function (error, response, body) {
             if (error) throw new Error(error);
@@ -104,7 +108,7 @@ function process(callback){
 
 }
 
-module.exports = { process };
+module.exports = { job };
 /****************** Main function  ********/
 
 
